@@ -257,12 +257,13 @@ public final class DownloadTask {
 		}
 
 		/**
-		 * Set preferred Bitmap.Config to decode image. @see {@link Bitmap.Config} for details.}
+		 * Set preferred Bitmap.Config to decode image, default is Bitmap.Config.ARGB_8888.<br/> 
+		 * Bitmap.Config.ALPHA_8 will be ignored. @see {@link Bitmap.Config} for details.}
 		 * @param bitmapConfig
 		 * @return builder instance.
 		 */
 		public Builder config(Bitmap.Config bitmapConfig) {
-			if(bitmapConfig != null){
+			if(bitmapConfig != null && !bitmapConfig.equals(Bitmap.Config.ALPHA_8)){
 				this.bitmapConfig = bitmapConfig;
 			}
 			return this;

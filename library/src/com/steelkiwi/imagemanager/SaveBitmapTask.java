@@ -62,11 +62,11 @@ public class SaveBitmapTask {
 
 	public static class Builder{
 		private BitmapCompressionListener compressionListener;
-		private CompressFormat format;
+		private CompressFormat format = CompressFormat.PNG;
 		private String path;
 		private String tag;
 		private Bitmap bitmap;
-		private int quality;
+		private int quality = 100;
 		
 		/**
 		 * Constructs a new Builder 
@@ -89,12 +89,17 @@ public class SaveBitmapTask {
 
 		/**
 		 * Set compression format for file, @see {@link CompressFormat} for details.
+		 * CompressFormat.PNG will be used by default.
 		 * @param format format to compress bitmap.
 		 * @return builder instance.
 		 */
 		public Builder compressTo(CompressFormat format){
-			this.format = format;
-			return this;
+			if(format != null){
+				this.format = format;
+				return this;
+			} else {
+				throw new IllegalArgumentException("CompressFormat cannot be null!");
+			}
 		}
 		
 		/**
@@ -121,12 +126,14 @@ public class SaveBitmapTask {
 		/**
 		 * Hint to the compressor, 0-100. 0 meaning compress for small size,<br/> 
 		 * 100 meaning compress for max quality. Some formats, like PNG which<br/> 
-		 * is lossless, will ignore the quality setting
+		 * is lossless, will ignore the quality setting. Default value - 100.
 		 * @param quality
 		 * @return builder instance.
 		 */
 		public Builder compressionQuality(int quality){
-			this.quality = quality;
+			if(quality > 0){
+				this.quality = quality;
+			}
 			return this;
 		}
 

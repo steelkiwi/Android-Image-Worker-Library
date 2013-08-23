@@ -9,6 +9,12 @@ import java.io.OutputStream;
 
 import android.os.AsyncTask;
 
+/**
+ * This class represents a task to store file asynchronously. <br/>
+ * You shouldn't instantiate it manually - you need to call ImageManager.save(SaveBitmapTask task) instead.
+ * @author syndarin
+ *
+ */
 public class SaveFileTask extends AsyncTask<Void, Void, Boolean> {
 	
 	private SaveBitmapTask task;

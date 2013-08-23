@@ -1,13 +1,13 @@
 package src;
 
-import com.steelkiwi.imagemanager.DownloadTask;
-import com.steelkiwi.imagemanager.ImageLoaderCallback;
-import com.steelkiwi.imagemanager.processing.ProportionalScaleProcessor;
-
 import android.graphics.Bitmap;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.animation.AlphaAnimation;
+
+import com.steelkiwi.imagemanager.DownloadTask;
+import com.steelkiwi.imagemanager.ImageLoaderCallback;
+import com.steelkiwi.imagemanager.processing.ProportionalScaleProcessor;
 
 /**
  * Set of tests for DownloadTask.java and DownloadTask.Builder
@@ -16,15 +16,8 @@ import android.view.animation.AlphaAnimation;
  */
 public class DownloadTaskTest extends AndroidTestCase {
 	
-	private final static String tag = DownloadTaskTest.class.getSimpleName();
 	private final static String VALID_IMAGE_URL = "https://lh6.googleusercontent.com/-55osAWw3x0Q/URquUtcFr5I/AAAAAAAAAbs/rWlj1RUKrYI/s1024/A%252520Photographer.jpg";
 	private final static String STUB_FILE_PATH = "file.jpg";
-	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		Log.i(tag, "set up...");
-	}
 	
 	public void testNullUrl(){
 		try{
@@ -116,12 +109,6 @@ public class DownloadTaskTest extends AndroidTestCase {
 		assertNotNull(task.getBitmapConfig());
 		assertNull(task.getImageProcessor());
 		assertNull(task.getAnimation());
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		Log.i(tag, "tear down...");
 	}
 	
 	ImageLoaderCallback callback = new ImageLoaderCallback() {

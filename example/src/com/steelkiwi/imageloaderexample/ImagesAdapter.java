@@ -54,7 +54,7 @@ public class ImagesAdapter extends BaseAdapter {
 		DownloadTask task = new DownloadTask.Builder()
 			.url(images[position])
 			.loadTo(holder.image)
-			.config(Bitmap.Config.RGB_565)
+			.config(Bitmap.Config.ALPHA_8)
 			.mCache()
 			.placeholder(placeholder)
 			.errorIcon(R.drawable.stub_error)
