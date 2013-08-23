@@ -143,7 +143,7 @@ public final class DownloadTask {
 		return errorIcon;
 	}
 
-	void prepareParamsForDCacheDownload(){
+	void changeParamsForDiscCacheDownload(){
 		isNetworkDownload = false;
 		path = getdCachePath();
 		dCache = false;
@@ -292,9 +292,7 @@ public final class DownloadTask {
 		 * @return builder instance.
 		 */
 		public Builder animation(Animation animation){
-			if(animation != null){
-				this.animation = animation;
-			}
+			this.animation = animation;
 			return this;
 		}
 		
@@ -317,12 +315,16 @@ public final class DownloadTask {
 		 * @return builder instance.
 		 */
 		public Builder scaleToProportionaly(int maxWidth, int maxHeight){
-			ImageProcessingDecorator processor = new ProportionalScaleProcessor(maxWidth, maxHeight);
-			addImageProcessor(processor);
-			processScaleProportionally = true;
-			processScaleMaxWidth = maxWidth;
-			processScaleMaxHeight = maxHeight;
-			return this;
+			if(maxWidth <= 0 || maxHeight <=0){
+				throw new IllegalArgumentException("Incorrect params for scaling width = " + maxWidth + ", height = " + maxHeight);
+			} else {
+				ImageProcessingDecorator processor = new ProportionalScaleProcessor(maxWidth, maxHeight);
+				addImageProcessor(processor);
+				processScaleProportionally = true;
+				processScaleMaxWidth = maxWidth;
+				processScaleMaxHeight = maxHeight;
+				return this;
+			}
 		}
 		
 		public Builder placeholder(int placeholder){

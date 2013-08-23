@@ -21,6 +21,11 @@ android{
 			resources.srcDirs = ['src']
 			res.srcDirs = ['res']
 		}
+		instrumentTest.setRoot('test')
+		instrumentTest{
+			java.srcDirs = ['test/src']
+			resources.srcDirs = ['test/src']
+		}
 	}
 }
 

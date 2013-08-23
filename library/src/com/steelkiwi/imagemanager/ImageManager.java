@@ -64,7 +64,7 @@ public class ImageManager {
 			task.setCacheRoot(cacheDir);
 			File f = new File(task.getdCachePath());
 			if (f.exists()) {
-				task.prepareParamsForDCacheDownload();
+				task.changeParamsForDiscCacheDownload();
 			}
 		}
 		prepareNewDownloadTask(task);
