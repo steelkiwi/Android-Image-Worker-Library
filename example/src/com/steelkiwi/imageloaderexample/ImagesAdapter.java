@@ -59,8 +59,8 @@ public class ImagesAdapter extends BaseAdapter {
 			.placeholder(placeholder)
 			.errorIcon(R.drawable.stub_error)
 			.animation(animation)
-			.cropToSquare()
 			.scaleToProportionaly(200, 200)
+			.forcePortrait()
 			.build();
 		
 		loader.loadImage(task);

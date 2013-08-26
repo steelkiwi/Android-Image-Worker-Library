@@ -11,6 +11,7 @@ import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import com.steelkiwi.imagemanager.processing.ImageProcessingDecorator;
+import com.steelkiwi.imagemanager.processing.PortraitProcessor;
 import com.steelkiwi.imagemanager.processing.ProportionalScaleProcessor;
 import com.steelkiwi.imagemanager.processing.SquareCropProcessor;
 
@@ -19,7 +20,7 @@ public final class DownloadTask {
 	/**
 	 * Represents this task as string to create unique key to use it in caches
 	 */
-	private final static String TASK_ID_PATTERN = "%s.%s.%s.%s.%s.%s";
+	private final static String TASK_ID_PATTERN = "%s.%s.%s.%s.%s.%s.%s";
 
 	private final String CACHE_IDENTIFIER;
 
@@ -41,6 +42,7 @@ public final class DownloadTask {
 	private int placeholder;
 	private int errorIcon;
 	private String dCachePath;
+	private boolean isForcePortrait;
 
 	private Bitmap result;
 
@@ -60,6 +62,7 @@ public final class DownloadTask {
 		this.processScaleMaxHeight = builder.processScaleMaxHeight;
 		this.placeholder = builder.placeholder;
 		this.errorIcon = builder.errorIcon;
+		this.isForcePortrait = builder.isForcePortrait;
 		CACHE_IDENTIFIER = createCacheIdentifier();
 	}
 
@@ -152,7 +155,7 @@ public final class DownloadTask {
 	private String createCacheIdentifier(){
 		String result = "";
 		try {
-			String tag = String.format(TASK_ID_PATTERN, path, bitmapConfig, processCropToSquare, processScaleProportionally, processScaleMaxWidth, processScaleMaxHeight);
+			String tag = String.format(TASK_ID_PATTERN, path, bitmapConfig, processCropToSquare, processScaleProportionally, processScaleMaxWidth, processScaleMaxHeight, isForcePortrait);
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
 			digest.update(tag.getBytes());
 			result = convertToHex(digest.digest());
@@ -213,6 +216,7 @@ public final class DownloadTask {
 		private int processScaleMaxHeight;
 		private int placeholder = ImageManager.NO_RESOURCE;
 		private int errorIcon = ImageManager.NO_RESOURCE;
+		private boolean isForcePortrait;
 
 		/**
 		 * Set target of image task - url of image to download.
@@ -302,8 +306,7 @@ public final class DownloadTask {
 		 * @return builder instance.
 		 */
 		public Builder cropToSquare(){
-			ImageProcessingDecorator processor = new SquareCropProcessor();
-			addImageProcessor(processor);
+			addImageProcessor(new SquareCropProcessor());
 			processCropToSquare = true;
 			return this;
 		}
@@ -326,6 +329,18 @@ public final class DownloadTask {
 				processScaleMaxHeight = maxHeight;
 				return this;
 			}
+		}
+		
+		/**
+		 * Forces result image to be rotated to 90 degrees<br/>
+		 * if it's width > height. It uses a Matrix to perform<br/>
+		 * transformation. 
+		 * @return builder instance.
+		 */
+		public Builder forcePortrait(){
+			addImageProcessor(new PortraitProcessor());
+			isForcePortrait = true;
+			return this;
 		}
 		
 		public Builder placeholder(int placeholder){
