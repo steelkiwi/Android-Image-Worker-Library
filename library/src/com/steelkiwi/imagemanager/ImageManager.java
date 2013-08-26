@@ -196,6 +196,17 @@ public class ImageManager {
 		}
 		new SaveFileTask(task).execute();
 	}
+	
+	/**
+	 * Delete file by path.
+	 * @param path
+	 */
+	public void delete(String path){
+		File f = new File(path);
+		if(f.exists()){
+			f.delete();
+		}
+	}
 
 	// ==========================================================================
 	// inner classes
