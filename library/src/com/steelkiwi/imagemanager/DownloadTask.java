@@ -146,6 +146,14 @@ public final class DownloadTask {
 	public int getErrorIcon() {
 		return errorIcon;
 	}
+	
+	public synchronized boolean isCancelled() {
+		return isCancelled;
+	}
+
+	public synchronized void setCancelled(boolean isCancelled) {
+		this.isCancelled = isCancelled;
+	}
 
 	void changeParamsForDiscCacheDownload(){
 		isNetworkDownload = false;
