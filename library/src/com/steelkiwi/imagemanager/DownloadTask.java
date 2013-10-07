@@ -43,6 +43,7 @@ public final class DownloadTask {
 	private int errorIcon;
 	private String dCachePath;
 	private boolean isForcePortrait;
+	private volatile boolean isCancelled;
 
 	private Bitmap result;
 
