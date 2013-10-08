@@ -104,7 +104,7 @@ public class SaveBitmapTask {
 		
 		/**
 		 * Full path to file you want to save bitmap to. Unnecessary parameter, <br/>
-		 * if you not set it bitmap will be saved to "ImageLoader.storageDir + / + System.currentTimeInMilliseconds()".
+		 * if you not set it bitmap will be saved to "ImageLoader.storageDir + / + System.nanoTime()".
 		 * @param path to store bitmap.
 		 * @return builder instance.
 		 */

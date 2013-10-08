@@ -43,6 +43,7 @@ public final class DownloadTask {
 	private int errorIcon;
 	private String dCachePath;
 	private boolean isForcePortrait;
+	private boolean stopped;
 
 	private Bitmap result;
 
@@ -144,6 +145,14 @@ public final class DownloadTask {
 
 	public int getErrorIcon() {
 		return errorIcon;
+	}
+	
+	public boolean isStopped() {
+		return stopped;
+	}
+
+	public void setStopped(boolean stopped) {
+		this.stopped = stopped;
 	}
 
 	void changeParamsForDiscCacheDownload(){

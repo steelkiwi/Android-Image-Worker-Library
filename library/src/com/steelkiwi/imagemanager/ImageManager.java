@@ -191,7 +191,7 @@ public class ImageManager {
 	public void save(SaveBitmapTask task) {
 		String pathToSave = task.getPath();
 		if (pathToSave == null) {
-			pathToSave = storageDir.getAbsolutePath() + File.separator + System.currentTimeMillis();
+			pathToSave = storageDir.getAbsolutePath() + File.separator + System.nanoTime();
 			task.setPath(pathToSave);
 		}
 		new SaveFileTask(task).execute();
