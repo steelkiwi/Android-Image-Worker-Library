@@ -43,7 +43,7 @@ public final class DownloadTask {
 	private int errorIcon;
 	private String dCachePath;
 	private boolean isForcePortrait;
-	private boolean stopped;
+	private volatile boolean isCancelled;
 
 	private Bitmap result;
 
@@ -147,12 +147,12 @@ public final class DownloadTask {
 		return errorIcon;
 	}
 	
-	public boolean isStopped() {
-		return stopped;
+	public synchronized boolean isCancelled() {
+		return isCancelled;
 	}
 
-	public void setStopped(boolean stopped) {
-		this.stopped = stopped;
+	public synchronized void setCancelled(boolean isCancelled) {
+		this.isCancelled = isCancelled;
 	}
 
 	void changeParamsForDiscCacheDownload(){

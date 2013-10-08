@@ -1,5 +1,5 @@
-Android Image Manager
-==========================
+Android Image Worker Library
+================================
 
 ImageManager is Android library that helps you to simplify operations of downloading and displaying images.
 
