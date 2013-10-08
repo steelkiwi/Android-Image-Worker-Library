@@ -74,18 +74,13 @@ public class NetworkImageLoader extends AbstractDownloader {
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+			onDownloadError(e);
 		} catch (IOException e) {
 			e.printStackTrace();
+			onDownloadError(e);
 		} finally {
-			if(is != null){
-				try {
-					is.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			closeInputStream(is);
 		}
 		
 	}
-
 }

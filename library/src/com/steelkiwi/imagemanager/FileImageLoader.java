@@ -52,14 +52,7 @@ public class FileImageLoader extends AbstractDownloader {
 			e.printStackTrace();
 			onDownloadError(e);
 		} finally {
-			if (imageStream != null) {
-				try {
-					imageStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			closeInputStream(imageStream);
 		}
 	}
-
 }

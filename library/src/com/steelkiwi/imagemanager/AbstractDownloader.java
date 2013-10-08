@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.graphics.Bitmap;
@@ -17,28 +18,26 @@ import com.steelkiwi.imagemanager.ImageManager.MemoryWatchdog;
 
 public abstract class AbstractDownloader implements Runnable {
 	
-	public final static int DOWNLOAD_SUCCESS = 900;
-	public final static int DOWNLOAD_ERROR = 901;
-	public final static int DOWNLOAD_INTERRUPTED = 902;
+	public final static int DOWNLOAD_SUCCESS = 900;                 // success code for download task
+	public final static int DOWNLOAD_ERROR = 901;					// error code for download task
+	public final static int DOWNLOAD_INTERRUPTED = 902;             // interrupted flag
 
 	public final static int BUFFER_SIZE = 8192;
 	
-	protected final static String REASON_ERROR = "Error";
+	protected final static String REASON_ERROR = "Error";           // only purpose for using these reasons is logging in MemoryWatchdog.java
 	protected final static String REASON_FINISHED = "Finished";
 	protected final static String REASON_CANCELLED = "Cancelled";
 	
-	protected final static int MAX_RETRY = 5;
-	protected final static long RETRY_SLEEP = 50;
+	protected final static int MAX_RETRY = 5;                       // max retry count to reserve memory in MemoryWatchdog.java
+	protected final static long RETRY_SLEEP = 50;                   // memory reservation retry interval
 	
-	private final static CompressFormat COMPRESS_FORMAT = CompressFormat.PNG;
+	private final static CompressFormat COMPRESS_FORMAT = CompressFormat.PNG; // compression settings for disk caching
 	private final static int COMPRESS_QUALITY = 100;
 
-	private volatile boolean stopped;
-	
-	protected Handler handler;
-	protected MemoryWatchdog memoryWatchdog;
-	protected DownloadTask task;
-	protected long bitmapSizeBytes;
+	protected Handler handler;                                      // handler of thread which will receive download result or error report
+	protected MemoryWatchdog memoryWatchdog;                        // MemoryWatchdog used to reserve some memory to download picture to avoid OutOfMemory error
+	protected DownloadTask task;                                    // task description and details
+	protected long bitmapSizeBytes;                                 // size of bitmap that will be download
 	
 	protected AbstractDownloader(Handler handler, MemoryWatchdog memoryWatchdog, DownloadTask task) {
 		this.handler = handler;
@@ -47,7 +46,7 @@ public abstract class AbstractDownloader implements Runnable {
 	}
 
 	public void stop(){
-		stopped = true;
+		task.setCancelled(true);
 	}
 	
 	protected void onDownloadComplete(Bitmap bm){
@@ -66,13 +65,17 @@ public abstract class AbstractDownloader implements Runnable {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} finally {
-				if(os != null){
-					try {
-						os.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				ensureOutputStreamClosed(os);
+			}
+		}
+	}
+
+	private void ensureOutputStreamClosed(OutputStream os) {
+		if(os != null){
+			try {
+				os.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -141,28 +144,28 @@ public abstract class AbstractDownloader implements Runnable {
 	protected boolean reserveMemoryForBitmapDecode(BitmapFactory.Options options){
 		bitmapSizeBytes = estimateBitmapSize(options);
 		int retryCounter = 0;
-		while(!memoryWatchdog.reserveMemory(bitmapSizeBytes, Thread.currentThread().getId(), task) && !stopped){
+		while(!memoryWatchdog.reserveMemory(bitmapSizeBytes, Thread.currentThread().getId(), task) && !task.isCancelled()){
 			try {
 				Thread.sleep(RETRY_SLEEP);
 				retryCounter++;
 				if(retryCounter == MAX_RETRY){
-					stopped = true;
+					task.setCancelled(true);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				stopped = true;
+				task.setCancelled(true);
 			}
 		}
 		
-		if(stopped){
+		if(task.isCancelled()){
 			onDownloadCancelled();
 		}
 		
-		return !stopped;
+		return !task.isCancelled();
 	}
 	
 	protected boolean isStopped(){
-		return stopped;
+		return task.isCancelled();
 	}
 	
 	private int getBytesPerPixel(Bitmap.Config config) {
@@ -172,6 +175,16 @@ public abstract class AbstractDownloader implements Runnable {
 			case ARGB_8888: return 4;
 			case RGB_565:   return 2;
 			default: throw new IllegalArgumentException("Unknown Bitmap.Config - " + task.getBitmapConfig());
+		}
+	}
+	
+	protected void closeInputStream(InputStream imageStream) {
+		if (imageStream != null) {
+			try {
+				imageStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
