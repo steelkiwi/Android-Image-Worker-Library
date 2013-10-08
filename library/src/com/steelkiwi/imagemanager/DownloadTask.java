@@ -71,8 +71,8 @@ public final class DownloadTask {
 		return path;
 	}
 
-	public WeakReference<ImageView> getView() {
-		return view;
+	public ImageView getView() {
+		return view != null ? view.get() : null;
 	}
 
 	public ImageLoaderCallback getCallback() {

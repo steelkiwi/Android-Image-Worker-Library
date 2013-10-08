@@ -71,14 +71,12 @@ public class ImageManager {
 	}
 
 	private void prepareNewDownloadTask(DownloadTask task) {
-		AbstractDownloader imageTask = task.isNetworkDownload() ? new NetworkImageLoader(handler, memoryWatchdog, task) : new FileImageLoader(handler, memoryWatchdog, task);
-		if (task.getView() != null) {
-			ImageView view = task.getView().get();
-			if (view != null) {
-				removeExistingTaskForView(view);
-				tasks.put(view, imageTask);
-				applyStubDrawable(view, task.getPlaceholder());
-			}
+		AbstractDownloader imageTask = DownloaderFactory.create(task, handler, memoryWatchdog);
+		ImageView view = task.getView();
+		if (view != null) {
+			stopExistingTaskForView(view);
+			tasks.put(view, imageTask);
+			applyStubDrawable(view, task.getPlaceholder());
 		}
 		executor.execute(imageTask);
 	}
@@ -108,11 +106,9 @@ public class ImageManager {
 			((Throwable) object).printStackTrace();
 		} else if (object instanceof DownloadTask) {
 			DownloadTask t = (DownloadTask) object;
-			if (what == AbstractDownloader.DOWNLOAD_ERROR && t.getView() != null) {
-				ImageView view = t.getView().get();
-				if (view != null) {
-					applyStubDrawable(view, t.getErrorIcon());
-				}
+			ImageView view = t.getView();
+			if (what == AbstractDownloader.DOWNLOAD_ERROR && view != null) {
+				applyStubDrawable(view, t.getErrorIcon());
 			}
 		}
 	}
@@ -127,16 +123,17 @@ public class ImageManager {
 	}
 
 	private void setResultToView(DownloadTask task) {
-		if (task.getView() != null) {
-			ImageView view = task.getView().get();
-			if (view != null) {
-				removeExistingTaskForView(view);
+		ImageView view = task.getView(); 
+		if (view != null) {
+			// task may be cancelled if some new task was created for this view (ImageView)
+			if(!task.isCancelled()){
+				stopExistingTaskForView(view);
 				view.setImageBitmap(task.getResult());
 				if (task.getAnimation() != null) {
 					view.clearAnimation();
 					view.startAnimation(task.getAnimation());
 				}
-			}
+			} 
 		}
 	}
 
@@ -146,7 +143,7 @@ public class ImageManager {
 		}
 	}
 
-	private void removeExistingTaskForView(ImageView view) {
+	private void stopExistingTaskForView(ImageView view) {
 		AbstractDownloader downloader = tasks.remove(view);
 		if (downloader != null) {
 			downloader.stop();
@@ -167,7 +164,7 @@ public class ImageManager {
 	}
 	
 	/**
-	 * Clears all cached files on FS.
+	 * Clears all cached files on file system.
 	 */
 	public void clearDiscCache(){
 		for(File f : cacheDir.listFiles()){

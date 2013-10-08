@@ -4,8 +4,7 @@ import android.graphics.Bitmap;
 
 public class SquareCropProcessor extends ImageProcessingDecorator {
 	
-	@SuppressWarnings("unused")
-	private final static String tag = SquareCropProcessor.class.getSimpleName();
+	public final static String tag = SquareCropProcessor.class.getSimpleName();
 
 	@Override
 	protected Bitmap applyProcessingEffect(Bitmap bm) {
