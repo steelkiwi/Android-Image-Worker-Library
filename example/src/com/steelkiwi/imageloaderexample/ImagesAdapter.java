@@ -52,7 +52,10 @@ public class ImagesAdapter extends BaseAdapter {
 
 		int placeholder = position%2 == 0 ? R.drawable.stub_green : R.drawable.stub_pink;
 		
-		DownloadTask task = new DownloadTask.Builder()
+		if(position % 2 == 0){
+			
+		}
+		DownloadTask.Builder taskBuilder = new DownloadTask.Builder()
 			.url(images[position])
 			.loadTo(holder.image)
 			.config(Bitmap.Config.RGB_565)
@@ -60,11 +63,15 @@ public class ImagesAdapter extends BaseAdapter {
 			.placeholder(placeholder)
 			.errorPlaceholder(BitmapFactory.decodeResource(convertView.getResources(), R.drawable.ic_launcher))
 			.animation(animation)
-			.scaleToProportionaly(200, 200)
-			.forcePortrait()
-			.build();
+			.cropToSquare();
 		
-		loader.loadImage(task);
+		if(position % 2 == 0){
+			taskBuilder.circleView();
+		}else{
+			taskBuilder.roundedView(30);
+		}
+		
+		loader.loadImage(taskBuilder.build());
 
 		return convertView;
 	}

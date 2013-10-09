@@ -45,7 +45,10 @@ public final class DownloadTask {
 	private Bitmap errorBitmap;
 	private String dCachePath;
 	private boolean isForcePortrait;
+	private boolean circleView;
+	private boolean roundedCorners;
 	private volatile boolean isCancelled;
+	private int cornerRadius;
 
 	private Bitmap result;
 
@@ -68,6 +71,9 @@ public final class DownloadTask {
 		this.isForcePortrait = builder.isForcePortrait;
 		this.placeholderBitmap = builder.placeholderBitmap;
 		this.errorBitmap = builder.errorBitmap;
+		this.circleView = builder.circleView;
+		this.roundedCorners = builder.roundedCorners;
+		this.cornerRadius = builder.cornerRadius;
 		CACHE_IDENTIFIER = createCacheIdentifier();
 	}
 
@@ -208,6 +214,18 @@ public final class DownloadTask {
 	String getCacheId() {
 		return CACHE_IDENTIFIER;
 	}
+	
+	public boolean isCircleView() {
+		return circleView;
+	}
+	
+	public boolean isRoundedCorners() {
+		return roundedCorners;
+	}
+
+	public int getCornerRadius() {
+		return cornerRadius;
+	}
 
 	BitmapFactory.Options createPreDecodeOptions() {
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -247,6 +265,9 @@ public final class DownloadTask {
 		private boolean isForcePortrait;
 		private Bitmap placeholderBitmap;
 		private Bitmap errorBitmap;
+		private boolean circleView;
+		private boolean roundedCorners;
+		private int cornerRadius;
 
 		/**
 		 * Set target of image task - url of image to download.
@@ -392,37 +413,87 @@ public final class DownloadTask {
 			return this;
 		}
 
+		/**
+		 * Set a placeholder - temp image that will be set to ImageView
+		 * @param placeholder - drawable resource Id
+		 * @return builder instance
+		 */
 		public Builder placeholder(int placeholder) {
 			this.placeholder = placeholder;
 			this.placeholderBitmap = null;
 			return this;
 		}
 
+		/**
+		 * Set a placeholder - temp image that will be set to ImageView
+		 * @param placeholder - placeholder-bitmap
+		 * @return builder instance
+		 */
 		public Builder placeholder(Bitmap placeholder) {
 			this.placeholderBitmap = placeholder;
 			this.placeholder = ImageManager.NO_RESOURCE;
 			return this;
 		}
 
+		/**
+		 * Set a error placeholder - image that will be set to ImageView if download failed.
+		 * @param placeholder - drawable resource Id
+		 * @return builder instance
+		 */
 		public Builder errorPlaceholder(int errorIcon) {
 			this.errorIcon = errorIcon;
 			this.errorBitmap = null;
 			return this;
 		}
 
+		/**
+		 * Set a error placeholder - image that will be set to ImageView if download failed.
+		 * @param placeholder - error placeholder bitmap
+		 * @return builder instance
+		 */
 		public Builder errorPlaceholder(Bitmap errorBitmap) {
 			this.errorBitmap = errorBitmap;
 			this.errorIcon = ImageManager.NO_RESOURCE;
 			return this;
 		}
 
+		/**
+		 * Apply a circle effect to image. IMPORTANT - circle effect don't modify original image
+		 * but only changes it representation in ImageView. Also this method will apply
+		 * cropToSquare transformation for resulting image so take it in mind.
+		 * @param cornerRadius - radius for corners.
+		 * @return builder instance
+		 */
+		public Builder circleView(){
+			this.circleView = true;
+			this.cropToSquare();
+			return this;
+		}
+		
+		/**
+		 * Apply a rounded corners effect to image. IMPORTANT - this method don't modify original image
+		 * but only changes it representation in ImageView.
+		 * @param cornerRadius - radius for corners.
+		 * @return builder instance
+		 */
+		public Builder roundedView(int cornerRadius){
+			
+			if(cornerRadius < 1){
+				throw new IllegalArgumentException("Corner radius illegal value - " + cornerRadius);
+			}
+			
+			this.roundedCorners = true;
+			this.cornerRadius = cornerRadius;
+			return this;
+		}
+		
 		private void addImageProcessor(ImageProcessingDecorator imageProcessor) {
 			if (this.imageProcessor != null) {
 				imageProcessor.decorate(this.imageProcessor);
 			}
 			this.imageProcessor = imageProcessor;
 		}
-
+		
 		public DownloadTask build() {
 			if (path == null || path.equals("")) {
 				throw new IllegalArgumentException("No path to get image specified!");

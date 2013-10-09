@@ -14,6 +14,8 @@ import android.widget.ImageView;
 
 import com.steelkiwi.imagemanager.thirdparty.MemoryCache;
 import com.steelkiwi.imagemanager.util.DiskUtil;
+import com.steelkiwi.imagemanager.util.EllipsideDrawable;
+import com.steelkiwi.imagemanager.util.RoundedDrawable;
 
 public class ImageManager {
 
@@ -135,8 +137,19 @@ public class ImageManager {
 		ImageView view = task.getView(); 
 		// task may be cancelled if some new task was created for this view (ImageView)
 		if (view != null && !task.isCancelled()) {
+			
 			stopExistingTaskForView(view);
-			view.setImageBitmap(task.getResult());
+			
+			Bitmap result = task.getResult();
+			
+			if(task.isCircleView()){
+				view.setImageDrawable(new EllipsideDrawable(result));
+			}else if(task.isRoundedCorners()){
+				view.setImageDrawable(new RoundedDrawable(result, task.getCornerRadius()));
+			}else{
+				view.setImageBitmap(result);
+			}
+			
 			if (task.getAnimation() != null) {
 				view.clearAnimation();
 				view.startAnimation(task.getAnimation());
