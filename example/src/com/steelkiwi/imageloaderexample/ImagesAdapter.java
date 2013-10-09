@@ -1,6 +1,7 @@
 package com.steelkiwi.imageloaderexample;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,10 +55,10 @@ public class ImagesAdapter extends BaseAdapter {
 		DownloadTask task = new DownloadTask.Builder()
 			.url(images[position])
 			.loadTo(holder.image)
-			.config(Bitmap.Config.ALPHA_8)
+			.config(Bitmap.Config.RGB_565)
 			.mCache()
 			.placeholder(placeholder)
-			.errorIcon(R.drawable.stub_error)
+			.errorPlaceholder(BitmapFactory.decodeResource(convertView.getResources(), R.drawable.ic_launcher))
 			.animation(animation)
 			.scaleToProportionaly(200, 200)
 			.forcePortrait()

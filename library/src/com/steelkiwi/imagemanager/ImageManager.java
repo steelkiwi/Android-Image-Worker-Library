@@ -76,15 +76,19 @@ public class ImageManager {
 		if (view != null) {
 			stopExistingTaskForView(view);
 			tasks.put(view, imageTask);
-			applyStubDrawable(view, task.getPlaceholder());
+			applyStubDrawable(task);
 		}
 		executor.execute(imageTask);
 	}
 
-	private void applyStubDrawable(ImageView view, int placeholder) {
-		if (placeholder != NO_RESOURCE) {
+	private void applyStubDrawable(DownloadTask task) {
+		ImageView view = task.getView();
+		if (task.getPlaceholderResourse() != NO_RESOURCE) {
 			view.clearAnimation();
-			view.setImageResource(placeholder);
+			view.setImageResource(task.getPlaceholderResourse());
+		}else if(task.getPlaceholderBitmap() != null){
+			view.clearAnimation();
+			view.setImageBitmap(task.getPlaceholderBitmap());
 		}
 	}
 
@@ -94,21 +98,26 @@ public class ImageManager {
 			if (msg.what == AbstractDownloader.DOWNLOAD_SUCCESS) {
 				onTaskCompletedSuccessfully((DownloadTask) msg.obj);
 			} else {
-				handleDownloadFailed(msg.obj, msg.what);
+				handleDownloadFailed((DownloadTask)msg.obj, msg.what);
 			}
 			msg.obj = null;
 			return true;
 		}
 	});
 
-	private void handleDownloadFailed(Object object, int what) {
-		if (object instanceof Throwable) {
-			((Throwable) object).printStackTrace();
-		} else if (object instanceof DownloadTask) {
-			DownloadTask t = (DownloadTask) object;
-			ImageView view = t.getView();
-			if (what == AbstractDownloader.DOWNLOAD_ERROR && view != null) {
-				applyStubDrawable(view, t.getErrorIcon());
+	private void handleDownloadFailed(DownloadTask task, int what) {
+		if (what == AbstractDownloader.DOWNLOAD_ERROR) {
+			setErrorIconAsResult(task);
+		}
+	}
+	
+	private void setErrorIconAsResult(DownloadTask task){
+		ImageView view = task.getView();
+		if(view != null){
+			if(task.getErrorPlaceholderResource() != NO_RESOURCE){
+				view.setImageResource(task.getErrorPlaceholderResource());
+			}else if(task.getErrorBitmap() != null){
+				view.setImageBitmap(task.getErrorBitmap());
 			}
 		}
 	}
@@ -118,22 +127,20 @@ public class ImageManager {
 		setResultToView(task);
 		notifyLoadingCallback(task);
 
-		task.setResult(null);
+		task.cleanup();
 		task = null;
 	}
 
 	private void setResultToView(DownloadTask task) {
 		ImageView view = task.getView(); 
-		if (view != null) {
-			// task may be cancelled if some new task was created for this view (ImageView)
-			if(!task.isCancelled()){
-				stopExistingTaskForView(view);
-				view.setImageBitmap(task.getResult());
-				if (task.getAnimation() != null) {
-					view.clearAnimation();
-					view.startAnimation(task.getAnimation());
-				}
-			} 
+		// task may be cancelled if some new task was created for this view (ImageView)
+		if (view != null && !task.isCancelled()) {
+			stopExistingTaskForView(view);
+			view.setImageBitmap(task.getResult());
+			if (task.getAnimation() != null) {
+				view.clearAnimation();
+				view.startAnimation(task.getAnimation());
+			}
 		}
 	}
 
